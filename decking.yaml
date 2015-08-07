@@ -1,0 +1,63 @@
+images: {
+    "klab-base": {
+      "path":     "./images/klab-base",
+      "context":  "./images/klab-base"
+    },
+    "klab-runtime": {
+      "path":     "./images/klab-runtime",
+      "context":  "./images/klab-runtime"
+    },
+    "michele-dev": {
+      "path":     "./images/michele-dev",
+      "context":  "./images/michele-dev"
+    },
+    "rabbitmq-service": {
+      "path":     "./images/rabbitmq-service",
+      "context":  "./images/rabbitmq-service"
+    }
+  }
+
+
+
+containers:
+
+  rabbitmq-service_master:
+    image:        rabbitmq-service
+    ## mount-from: ["rabbitmq-data_master"]
+
+  klab-runtime_master:
+    image:        klab-runtime
+    port:         ["127.0.0.1:2222:22"]
+    dependencies:
+      - rabbitmq-service_master:rabbitmq
+
+  michele-dev_master:
+    image:        michele-dev
+    port:         ["127.0.0.1:2223:22"]
+    dependencies:
+      - rabbitmq-service_master:rabbitmq
+    ## mount-from: ["michele-home_master"]
+
+
+
+
+clusters:
+  dev-master:     ["rabbitmq-service_master", "klab-runtime_master", "michele-dev_master"]
+  entity-v2:      ["rabbitmq-service_master", "klab-runtime_master", "michele-dev_master"]
+
+
+
+## FIXME: env doesnt work
+
+groups:
+  dev-master:
+    containers:
+      rabbitmq-service_master:    { port: ["127.0.0.1:15672:15672"],  env: ["PONDNAME=dev-master"] }
+      klab-runtime_master:        { port: ["127.0.0.1:2222:22"],      env: ["PONDNAME=dev-master"] }
+      michele-dev_master:         { port: ["127.0.0.1:2223:22"],      env: ["PONDNAME=dev-master"] }
+
+  entity-v2:
+    containers:
+      rabbitmq-service_master:    { port: ["127.0.0.1:25672:15672"],  env: ["PONDNAME=entity-v2"] }
+      klab-runtime_master:        { port: ["127.0.0.1:3222:22"],      env: ["PONDNAME=entity-v2"] }
+      michele-dev_master:         { port: ["127.0.0.1:3223:22"],      env: ["PONDNAME=entity-v2"] }
