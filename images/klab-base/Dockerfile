@@ -24,5 +24,17 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
+RUN mkdir /root/.ssh
+RUN touch /root/.ssh/environment
+# RUN echo "TEST_ENV=test_passed" >> /root/.ssh/environment
+RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
+
+
+
+
+# --- startup script ---
+ADD startup.sh /startup.sh
+RUN chmod a+x /startup.sh
+
 EXPOSE 22
-CMD ["/usr/sbin/sshd", "-D"]
+CMD ["/startup.sh"]

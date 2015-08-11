@@ -52,12 +52,13 @@ clusters:
 groups:
   dev-master:
     containers:
-      rabbitmq-service_master:    { port: ["127.0.0.1:15672:15672"],  env: ["PONDNAME=dev-master"] }
-      klab-runtime_master:        { port: ["127.0.0.1:2222:22"],      env: ["PONDNAME=dev-master"] }
-      michele-dev_master:         { port: ["127.0.0.1:2223:22"],      env: ["PONDNAME=dev-master"] }
+      rabbitmq-service_master:    { port: ["127.0.0.1:15672:15672"],  env: ["POND_NAME=dev-master"] }
+      klab-runtime_master:        { port: ["127.0.0.1:2222:22"],      env: ["POND_NAME=dev-master"] }
+      michele-dev_master:         { port: ["127.0.0.1:2223:22"],      env: ["POND_NAME=dev-master"] }
 
   entity-v2:
     containers:
-      rabbitmq-service_master:    { port: ["127.0.0.1:25672:15672"],  env: ["PONDNAME=entity-v2"] }
-      klab-runtime_master:        { port: ["127.0.0.1:3222:22"],      env: ["PONDNAME=entity-v2"] }
-      michele-dev_master:         { port: ["127.0.0.1:3223:22"],      env: ["PONDNAME=entity-v2"] }
+      rabbitmq-service_master:    { port: ["127.0.0.1:25672:15672"],  env: ["POND_NAME=entity-v2"] }
+      klab-runtime_master:        { port: ["127.0.0.1:3222:22"],      env: ["POND_NAME=entity-v2"] }
+      michele-dev_master:         { port: ["127.0.0.1:3223:22"],      env: ["POND_NAME=entity-v2"] }
+
