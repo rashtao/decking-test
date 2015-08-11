@@ -18,6 +18,10 @@ images: {
     "rabbitmq-service": {
       "path":     "./images/rabbitmq-service",
       "context":  "./images/rabbitmq-service"
+    },
+    "mongo-service": {
+      "path":     "./images/mongo-service",
+      "context":  "./images/mongo-service"
     }
   }
 
@@ -34,35 +38,49 @@ containers:
     port:         ["127.0.0.1:2222:22"]
     dependencies:
       - rabbitmq-service:rabbitmq
+      - mongo-service:mongo
 
   michele-dev:
     image:        michele-dev
     port:         ["127.0.0.1:2223:22"]
     dependencies:
       - rabbitmq-service:rabbitmq
-    mount-from: ["michele-home"]
+      - mongo-service:mongo
+    mount-from:   ["michele-home"]
 
   michele-home:
     image:        data-only
     data:         true
-    mount:        ["/home/rashta/github/decking-test/images/michele-dev/home:/home/michele"]
+    mount:        ["/home/rashta/github/decking-test/data/michele-home:/home/michele"]
+
+  mongo-service:
+    image:        mongo-service
+    mount-from:   ["mongo-data"]
+
+  mongo-data:
+    image:        data-only
+    data:         true
 
 
 clusters:
-  dev-master:     ["rabbitmq-service", "klab-runtime", "michele-dev"]
-  entity-v2:      ["rabbitmq-service", "klab-runtime", "michele-dev"]
+  dev-master:     ["rabbitmq-service", "klab-runtime", "michele-dev", "mongo-service", "mongo-data"]
+  entity-v2:      ["rabbitmq-service", "klab-runtime", "michele-dev", "mongo-service", "mongo-data"]
 
 
 groups:
   dev-master:
     containers:
-      rabbitmq-service:    { port: ["127.0.0.1:15672:15672"],  env: ["POND_NAME=dev-master"] }
-      klab-runtime:        { port: ["127.0.0.1:2222:22"],      env: ["POND_NAME=dev-master"] }
-      michele-dev:         { port: ["127.0.0.1:2223:22"],      env: ["POND_NAME=dev-master"] }
+      rabbitmq-service:    { port:  ["127.0.0.1:15672:15672"],  env: ["POND_NAME=dev-master"] }
+      klab-runtime:        { port:  ["127.0.0.1:2222:22"],      env: ["POND_NAME=dev-master"] }
+      michele-dev:         { port:  ["127.0.0.1:2223:22"],      env: ["POND_NAME=dev-master"] }
+      mongo-service:       { port:  ["127.0.0.1:27017:27017"] }
+      mongo-data:          { mount: ["/home/rashta/github/decking-test/data/dev-master/mongo-test:/data/db"] }
 
   entity-v2:
     containers:
       rabbitmq-service:    { port: ["127.0.0.1:25672:15672"],  env: ["POND_NAME=entity-v2"] }
       klab-runtime:        { port: ["127.0.0.1:3222:22"],      env: ["POND_NAME=entity-v2"] }
       michele-dev:         { port: ["127.0.0.1:3223:22"],      env: ["POND_NAME=entity-v2"] }
+      mongo-service:       { port:  ["127.0.0.1:37017:27017"] }
+      mongo-data:          { mount: ["/home/rashta/github/decking-test/data/entity-v2/mongo-test:/data/db"] }
 
