@@ -3,6 +3,10 @@ images: {
       "path":     "./images/klab-base",
       "context":  "./images/klab-base"
     },
+    "data-only": {
+      "path":     "./images/data-only",
+      "context":  "./images/data-only"
+    },
     "klab-runtime": {
       "path":     "./images/klab-runtime",
       "context":  "./images/klab-runtime"
@@ -21,44 +25,44 @@ images: {
 
 containers:
 
-  rabbitmq-service_master:
+  rabbitmq-service:
     image:        rabbitmq-service
-    ## mount-from: ["rabbitmq-data_master"]
+    ## mount-from: ["rabbitmq-data"]
 
-  klab-runtime_master:
+  klab-runtime:
     image:        klab-runtime
     port:         ["127.0.0.1:2222:22"]
     dependencies:
-      - rabbitmq-service_master:rabbitmq
+      - rabbitmq-service:rabbitmq
 
-  michele-dev_master:
+  michele-dev:
     image:        michele-dev
     port:         ["127.0.0.1:2223:22"]
     dependencies:
-      - rabbitmq-service_master:rabbitmq
-    ## mount-from: ["michele-home_master"]
+      - rabbitmq-service:rabbitmq
+    mount-from: ["michele-home"]
 
-
+  michele-home:
+    image:        data-only
+    data:         true
+    mount:        ["/home/rashta/github/decking-test/images/michele-dev/home:/home/michele"]
 
 
 clusters:
-  dev-master:     ["rabbitmq-service_master", "klab-runtime_master", "michele-dev_master"]
-  entity-v2:      ["rabbitmq-service_master", "klab-runtime_master", "michele-dev_master"]
+  dev-master:     ["rabbitmq-service", "klab-runtime", "michele-dev"]
+  entity-v2:      ["rabbitmq-service", "klab-runtime", "michele-dev"]
 
-
-
-## FIXME: env doesnt work
 
 groups:
   dev-master:
     containers:
-      rabbitmq-service_master:    { port: ["127.0.0.1:15672:15672"],  env: ["POND_NAME=dev-master"] }
-      klab-runtime_master:        { port: ["127.0.0.1:2222:22"],      env: ["POND_NAME=dev-master"] }
-      michele-dev_master:         { port: ["127.0.0.1:2223:22"],      env: ["POND_NAME=dev-master"] }
+      rabbitmq-service:    { port: ["127.0.0.1:15672:15672"],  env: ["POND_NAME=dev-master"] }
+      klab-runtime:        { port: ["127.0.0.1:2222:22"],      env: ["POND_NAME=dev-master"] }
+      michele-dev:         { port: ["127.0.0.1:2223:22"],      env: ["POND_NAME=dev-master"] }
 
   entity-v2:
     containers:
-      rabbitmq-service_master:    { port: ["127.0.0.1:25672:15672"],  env: ["POND_NAME=entity-v2"] }
-      klab-runtime_master:        { port: ["127.0.0.1:3222:22"],      env: ["POND_NAME=entity-v2"] }
-      michele-dev_master:         { port: ["127.0.0.1:3223:22"],      env: ["POND_NAME=entity-v2"] }
+      rabbitmq-service:    { port: ["127.0.0.1:25672:15672"],  env: ["POND_NAME=entity-v2"] }
+      klab-runtime:        { port: ["127.0.0.1:3222:22"],      env: ["POND_NAME=entity-v2"] }
+      michele-dev:         { port: ["127.0.0.1:3223:22"],      env: ["POND_NAME=entity-v2"] }
 
